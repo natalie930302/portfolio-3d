@@ -1,0 +1,26 @@
+{
+  "models": [
+    "/models/Golden Snitch.glb",
+    "/models/LAWSON 富士河口湖町役場前店.glb",
+    "/models/TAIPEI 101.glb",
+    "/models/i16 miffy 手機殼.glb",
+    "/models/i16 手機.glb",
+    "/models/miffy 雨天玩偶設計.glb",
+    "/models/ntue 陰刻陽刻印章.glb",
+    "/models/幾何圖騰練習.glb",
+    "/models/書架.glb",
+    "/models/機構練習.glb",
+    "/models/滑鼠殼.glb",
+    "/models/火車.glb",
+    "/models/矩陣圖騰練習.glb",
+    "/models/線段圖騰練習.glb",
+    "/models/肥皂架 1.glb",
+    "/models/肥皂盒 2.glb",
+    "/models/馬克杯.glb",
+    "/models/骰子.glb"
+  ],
+  "env": [
+    "/env/env1.png",
+    "/env/env2.png"
+  ]
+}

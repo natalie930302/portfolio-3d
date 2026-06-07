@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(cat C:\\\\\\\\Users\\\\\\\\Natalie\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\claude\\\\\\\\C--Users-Natalie-Downloads-portfolio3d\\\\\\\\83eac8b5-2563-406f-b865-6f791cbd44cd\\\\\\\\tasks\\\\\\\\bpcdw5iqg.output)",
+      "Bash(npm install *)",
+      "Bash(npx vite *)",
+      "Bash(node -e \"const pkg = require\\('./node_modules/three/package.json'\\); console.log\\(pkg.version\\)\")"
+    ]
+  }
+}
