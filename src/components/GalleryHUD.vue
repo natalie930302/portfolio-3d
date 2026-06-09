@@ -112,7 +112,6 @@
         </div>
       </div>
       <div class="focus-right">
-        <span class="focus-controls">{{ isMobile ? '拖曳旋轉 · 捏合縮放' : '拖曳旋轉 · 滾輪縮放' }}</span>
         <button class="focus-esc" @click="$emit('exitFocus')">ESC</button>
       </div>
     </div>
@@ -122,10 +121,7 @@
   <Transition name="fade">
     <div v-if="focusMode !== 'focused'" class="bottom-bar">
       <span class="attribution">111113213 &nbsp;·&nbsp; 數資四 &nbsp;·&nbsp; 許安婷</span>
-      <Transition name="fade">
-        <span v-if="showHint" class="nav-hint">{{ isMobile ? '搖桿移動 · 點擊展品近看' : '拖曳轉頭 · WASD 移動 · 點擊展品近看' }}</span>
-      </Transition>
-      <span class="work-count" style="opacity:0">·</span>
+<span class="work-count" style="opacity:0">·</span>
     </div>
   </Transition>
 

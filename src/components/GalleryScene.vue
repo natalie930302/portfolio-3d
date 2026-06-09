@@ -15,7 +15,6 @@
         <ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(30 12 12)" />
         <circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" />
       </svg>
-      <span>{{ gyroActive ? '陀螺儀' : '陀螺儀' }}</span>
     </button>
 
     <!-- Virtual joystick (mobile, free mode only) -->
