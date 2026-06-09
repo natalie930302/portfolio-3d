@@ -20,8 +20,6 @@
 
     <!-- Virtual joystick (mobile, free mode only) -->
     <template v-if="showGyroBtn && focusMode === 'free'">
-      <!-- Static hint ring -->
-      <div class="joy-hint" />
       <!-- Active joystick -->
       <div
         v-if="joystickState.active"
@@ -423,17 +421,6 @@ onUnmounted(() => _cleanup?.());
 }
 
 /* ── Virtual joystick ─────────────────────────────────── */
-.joy-hint {
-  position: fixed;
-  left: 24px;
-  bottom: 80px;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  border: 1.5px dashed rgba(255, 255, 255, 0.18);
-  pointer-events: none;
-  z-index: 40;
-}
 .joy-base {
   position: fixed;
   width: 110px;
