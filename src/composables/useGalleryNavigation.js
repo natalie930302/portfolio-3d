@@ -82,10 +82,12 @@ export function useGalleryNavigation(camera, canvas) {
     focusState.savedPitch = pitch
 
     const dir = new THREE.Vector3(pedestalPos.x, 0, pedestalPos.z).normalize()
+    // Mobile keeps more distance so the model doesn't fill the small screen
+    const focusDist = navigator.maxTouchPoints > 0 ? 2.2 : 1.5
     focusState.targetPos.set(
-      pedestalPos.x - dir.x * 1.5,
+      pedestalPos.x - dir.x * focusDist,
       1.65,
-      pedestalPos.z - dir.z * 1.5
+      pedestalPos.z - dir.z * focusDist
     )
 
     const localCenterY = modelGroup.userData?.focusCenterLocalY ?? 0.35
@@ -98,6 +100,10 @@ export function useGalleryNavigation(camera, canvas) {
     )
     focusState.targetYaw   = Math.atan2(-toModel.x, -toModel.z)
     focusState.targetPitch = Math.asin(THREE.MathUtils.clamp(toModel.y / toModel.length(), -1, 1))
+
+    // Tilt camera slightly down so the model centers in the visible area above the focus bar
+    // (~68px bar out of screen height, half-FOV = 35°)
+    focusState.targetPitch -= (68 / window.innerHeight) * (35 * Math.PI / 180)
 
     focusState.pedModelPos.set(pedestalPos.x, MODEL_Y, pedestalPos.z)
     focusState.startPos.copy(camera.position)
