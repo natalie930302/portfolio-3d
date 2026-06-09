@@ -18,6 +18,25 @@
       <span>{{ gyroActive ? '陀螺儀' : '陀螺儀' }}</span>
     </button>
 
+    <!-- Virtual joystick (mobile, free mode only) -->
+    <template v-if="showGyroBtn && focusMode === 'free'">
+      <!-- Static hint ring -->
+      <div class="joy-hint" />
+      <!-- Active joystick -->
+      <div
+        v-if="joystickState.active"
+        class="joy-base"
+        :style="{ left: joystickState.baseX + 'px', top: joystickState.baseY + 'px' }"
+      >
+        <div
+          class="joy-thumb"
+          :style="{
+            transform: `translate(${joystickState.nx * 55}px, ${joystickState.nz * 55}px)`
+          }"
+        />
+      </div>
+    </template>
+
     <GalleryHUD
       :works="works"
       :pedestal-positions="positions"
@@ -76,6 +95,9 @@ const gyroPending = ref(false);
 const showGyroBtn = ref(
   typeof DeviceOrientationEvent !== 'undefined' && navigator.maxTouchPoints > 0
 );
+
+// Virtual joystick state (polled each frame)
+const joystickState = ref({ active: false, baseX: 0, baseY: 0, nx: 0, nz: 0 });
 
 async function toggleGyro() {
   if (!navigation) return;
@@ -278,6 +300,12 @@ onMounted(() => {
       playerState.value = { x: camera.position.x, z: camera.position.z, yaw: navigation.getYaw() }
     }
 
+    // Joystick visual — update every frame when mobile
+    if (showGyroBtn.value) {
+      const js = navigation.getJoystickState()
+      if (js.active || joystickState.value.active) joystickState.value = js
+    }
+
     // Throttled raycasting — once per frame, only in free mode
     if (fMode === "free") {
       pointer.x = (_ptrX / window.innerWidth) * 2 - 1;
@@ -390,6 +418,43 @@ onUnmounted(() => _cleanup?.());
 }
 .loader-fade-leave-to {
   opacity: 0;
+}
+
+/* ── Virtual joystick ─────────────────────────────────── */
+.joy-hint {
+  position: fixed;
+  left: 28px;
+  bottom: 28px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(255, 255, 255, 0.18);
+  pointer-events: none;
+  z-index: 40;
+}
+.joy-base {
+  position: fixed;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  background: rgba(14, 12, 10, 0.45);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  z-index: 41;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.joy-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 218, 130, 0.55);
+  box-shadow: 0 0 14px rgba(255, 218, 130, 0.3);
+  pointer-events: none;
+  transition: background 0.1s;
 }
 
 /* ── Gyroscope button ──────────────────────────────────── */
