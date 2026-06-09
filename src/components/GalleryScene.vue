@@ -451,13 +451,13 @@ onUnmounted(() => _cleanup?.());
   bottom: 148px;
   right: 14px;
   z-index: 50;
+  width: 44px;
+  height: 44px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 10px 12px 8px;
+  justify-content: center;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 12px;
+  border-radius: 10px;
   background: rgba(14, 12, 10, 0.72);
   backdrop-filter: blur(8px);
   color: rgba(255, 255, 255, 0.55);
@@ -470,11 +470,6 @@ onUnmounted(() => _cleanup?.());
   width: 22px;
   height: 22px;
   transition: transform 0.6s ease;
-}
-.gyro-btn span {
-  font-family: "Space Mono", monospace;
-  font-size: 0.58rem;
-  letter-spacing: 0.12em;
 }
 .gyro-btn:active {
   transform: scale(0.94);

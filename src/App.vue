@@ -57,7 +57,7 @@ window.addEventListener('drop', e => { e.preventDefault(); dragCount = 0; draggi
 html, body { overscroll-behavior: none; overflow: hidden; height: 100%; }
 body { background: #0d0c0b; color: #fff; font-family: 'Noto Serif TC', serif; }
 
-.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.25rem; padding: 7rem 2rem; text-align: center; min-height: 100vh; }
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.25rem; padding: 7rem 2rem; text-align: center; min-height: 100dvh; }
 .empty-icon { font-size: 3rem; opacity: .25; }
 .empty-title { font-size: 1.1rem; font-weight: 300; color: rgba(255,255,255,.7); }
 .empty-sub { font-family: 'Space Mono', monospace; font-size: .65rem; color: rgba(255,255,255,.35); line-height: 2.2; }

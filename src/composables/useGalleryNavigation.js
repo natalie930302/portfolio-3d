@@ -42,6 +42,9 @@ export function useGalleryNavigation(camera, canvas) {
   // Camera-rotation touch (right side / general)
   let touchId = -1, touchX = 0, touchY = 0
 
+  // Pinch-to-zoom (focused mode, second finger)
+  let pinchId = -1, pinchLastDist = 0
+
   // Joystick touch (left half of screen, free mode)
   let joyId = -1, joyBaseX = 0, joyBaseY = 0, joyNx = 0, joyNz = 0
 
@@ -194,9 +197,20 @@ export function useGalleryNavigation(camera, canvas) {
 
   function onTouchStart(e) {
     for (const t of e.changedTouches) {
-      // In focused mode, any finger = model-rotation touch
+      // In focused mode: first finger = rotate, second finger = pinch zoom
       if (focusState.mode === 'focused' || focusState.mode !== 'free') {
-        if (touchId === -1) { touchId = t.identifier; touchX = t.clientX; touchY = t.clientY }
+        if (touchId === -1) {
+          touchId = t.identifier; touchX = t.clientX; touchY = t.clientY
+        } else if (pinchId === -1) {
+          pinchId = t.identifier
+          // Compute initial pinch distance
+          const other = [...e.touches].find(x => x.identifier === touchId)
+          if (other) {
+            const dx = t.clientX - other.clientX
+            const dy = t.clientY - other.clientY
+            pinchLastDist = Math.sqrt(dx * dx + dy * dy)
+          }
+        }
         continue
       }
 
@@ -214,6 +228,24 @@ export function useGalleryNavigation(camera, canvas) {
   }
 
   function onTouchMove(e) {
+    // Pinch-to-zoom in focused mode (two fingers)
+    if (pinchId !== -1 && focusState.mode === 'focused') {
+      const t0 = [...e.touches].find(x => x.identifier === touchId)
+      const t1 = [...e.touches].find(x => x.identifier === pinchId)
+      if (t0 && t1) {
+        const dx = t1.clientX - t0.clientX
+        const dy = t1.clientY - t0.clientY
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        const delta = pinchLastDist - dist           // positive = pinch in = zoom out
+        pinchLastDist = dist
+        camera.getWorldDirection(_wheelDir)
+        const step = delta * 0.018                   // scale to match scroll sensitivity
+        const newPos = camera.position.clone().addScaledVector(_wheelDir, -step)
+        const d = newPos.distanceTo(focusState.pedModelPos)
+        if (d >= FOCUS_ZOOM_MIN && d <= FOCUS_ZOOM_MAX) camera.position.copy(newPos)
+      }
+    }
+
     for (const t of e.changedTouches) {
       // Joystick
       if (t.identifier === joyId) {
@@ -252,8 +284,9 @@ export function useGalleryNavigation(camera, canvas) {
 
   function onTouchEnd(e) {
     for (const t of e.changedTouches) {
-      if (t.identifier === joyId) { joyId = -1; joyNx = 0; joyNz = 0 }
+      if (t.identifier === joyId)   { joyId = -1; joyNx = 0; joyNz = 0 }
       if (t.identifier === touchId) { touchId = -1 }
+      if (t.identifier === pinchId) { pinchId = -1; pinchLastDist = 0 }
     }
   }
 
