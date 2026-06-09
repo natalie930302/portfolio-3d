@@ -4,7 +4,7 @@
 
     <!-- Gyroscope toggle — only shown on touch devices with DeviceOrientationEvent -->
     <button
-      v-if="showGyroBtn"
+      v-if="showGyroBtn && focusMode === 'free'"
       class="gyro-btn"
       :class="{ active: gyroActive, pending: gyroPending }"
       :title="gyroActive ? '重新校準 / 關閉陀螺儀' : '啟用陀螺儀鏡頭'"
