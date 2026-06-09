@@ -108,7 +108,6 @@
         <span class="focus-idx">{{ String((focusedWork?.index ?? 0) + 1).padStart(2, '0') }}</span>
         <div class="focus-text">
           <div class="focus-name">{{ focusedWork?.name }}</div>
-          <div v-if="focusedWork?.desc" class="focus-desc">{{ focusedWork.desc }}</div>
         </div>
       </div>
       <div class="focus-right">
