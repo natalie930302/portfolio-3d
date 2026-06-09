@@ -135,20 +135,42 @@
   <Transition name="panel">
     <div v-if="showHelp" class="help-panel">
       <div class="help-header">操作指引</div>
-      <div class="help-section">
-        <div class="help-label">自由漫遊</div>
-        <div class="help-row"><kbd>拖曳滑鼠</kbd><span>環顧展廳</span></div>
-        <div class="help-row"><kbd>W A S D</kbd><span>前後左右移動</span></div>
-        <div class="help-row"><kbd>滾輪</kbd><span>快速前進後退</span></div>
-        <div class="help-row"><kbd>點擊展品</kbd><span>近距離觀賞</span></div>
-      </div>
-      <div class="help-section">
-        <div class="help-label">觀賞展品</div>
-        <div class="help-row"><kbd>拖曳</kbd><span>360° 旋轉模型</span></div>
-        <div class="help-row"><kbd>滾輪</kbd><span>縮放觀賞距離</span></div>
-        <div class="help-row"><kbd>‹ ›</kbd><span>切換上下件展品</span></div>
-        <div class="help-row"><kbd>ESC / 右鍵</kbd><span>返回展廳</span></div>
-      </div>
+
+      <!-- 手機版 -->
+      <template v-if="isMobile">
+        <div class="help-section">
+          <div class="help-label">自由漫遊</div>
+          <div class="help-row"><kbd>左側滑動</kbd><span>移動位置</span></div>
+          <div class="help-row"><kbd>右側滑動</kbd><span>環顧展廳</span></div>
+          <div class="help-row"><kbd>陀螺儀</kbd><span>傾斜手機轉頭</span></div>
+          <div class="help-row"><kbd>點擊展品</kbd><span>近距離觀賞</span></div>
+        </div>
+        <div class="help-section">
+          <div class="help-label">觀賞展品</div>
+          <div class="help-row"><kbd>單指拖曳</kbd><span>360° 旋轉模型</span></div>
+          <div class="help-row"><kbd>雙指捏合</kbd><span>縮放觀賞距離</span></div>
+          <div class="help-row"><kbd>‹ ›</kbd><span>切換上下件展品</span></div>
+          <div class="help-row"><kbd>返回展廳</kbd><span>離開觀賞模式</span></div>
+        </div>
+      </template>
+
+      <!-- 桌機版 -->
+      <template v-else>
+        <div class="help-section">
+          <div class="help-label">自由漫遊</div>
+          <div class="help-row"><kbd>拖曳滑鼠</kbd><span>環顧展廳</span></div>
+          <div class="help-row"><kbd>W A S D</kbd><span>前後左右移動</span></div>
+          <div class="help-row"><kbd>滾輪</kbd><span>快速前進後退</span></div>
+          <div class="help-row"><kbd>點擊展品</kbd><span>近距離觀賞</span></div>
+        </div>
+        <div class="help-section">
+          <div class="help-label">觀賞展品</div>
+          <div class="help-row"><kbd>拖曳</kbd><span>360° 旋轉模型</span></div>
+          <div class="help-row"><kbd>滾輪</kbd><span>縮放觀賞距離</span></div>
+          <div class="help-row"><kbd>‹ ›</kbd><span>切換上下件展品</span></div>
+          <div class="help-row"><kbd>ESC / 右鍵</kbd><span>返回展廳</span></div>
+        </div>
+      </template>
     </div>
   </Transition>
 </template>
