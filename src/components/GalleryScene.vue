@@ -358,11 +358,13 @@ onUnmounted(() => _cleanup?.());
   position: fixed;
   inset: 0;
   background: #d4d0c8;
+  overscroll-behavior: none;
 }
 .gallery-canvas {
   width: 100%;
   height: 100%;
   display: block;
+  touch-action: none;
 }
 
 .loading-screen {
@@ -423,8 +425,8 @@ onUnmounted(() => _cleanup?.());
 /* ── Virtual joystick ─────────────────────────────────── */
 .joy-hint {
   position: fixed;
-  left: 28px;
-  bottom: 28px;
+  left: 24px;
+  bottom: 80px;
   width: 80px;
   height: 80px;
   border-radius: 50%;
@@ -460,8 +462,8 @@ onUnmounted(() => _cleanup?.());
 /* ── Gyroscope button ──────────────────────────────────── */
 .gyro-btn {
   position: fixed;
-  bottom: 24px;
-  right: 20px;
+  bottom: 148px;
+  right: 14px;
   z-index: 50;
   display: flex;
   flex-direction: column;

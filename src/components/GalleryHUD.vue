@@ -1,6 +1,6 @@
 <template>
-  <!-- ── 準心 — 自由模式輔助對準 ─────────────────────────────────── -->
-  <div v-if="focusMode === 'free'" class="crosshair" />
+  <!-- ── 準心 — 自由模式輔助對準（桌機滑鼠用，手機不顯示） ──────── -->
+  <div v-if="focusMode === 'free' && !isMobile" class="crosshair" />
 
   <!-- ── 俯視小地圖 — 自由模式，右下角 ──────────────────────────── -->
   <div v-if="focusMode === 'free' && pedestalPositions?.length" class="minimap-wrap">
@@ -112,7 +112,7 @@
         </div>
       </div>
       <div class="focus-right">
-        <span class="focus-controls">拖曳旋轉 &nbsp;·&nbsp; 滾輪縮放</span>
+        <span class="focus-controls">{{ isMobile ? '拖曳旋轉 · 捏合縮放' : '拖曳旋轉 · 滾輪縮放' }}</span>
         <button class="focus-esc" @click="$emit('exitFocus')">ESC</button>
       </div>
     </div>
@@ -123,7 +123,7 @@
     <div v-if="focusMode !== 'focused'" class="bottom-bar">
       <span class="attribution">111113213 &nbsp;·&nbsp; 數資四 &nbsp;·&nbsp; 許安婷</span>
       <Transition name="fade">
-        <span v-if="showHint" class="nav-hint">拖曳轉頭 &nbsp;·&nbsp; WASD 移動 &nbsp;·&nbsp; 點擊展品近看</span>
+        <span v-if="showHint" class="nav-hint">{{ isMobile ? '搖桿移動 · 點擊展品近看' : '拖曳轉頭 · WASD 移動 · 點擊展品近看' }}</span>
       </Transition>
       <span class="work-count" style="opacity:0">·</span>
     </div>
@@ -171,6 +171,7 @@ defineProps({
 defineEmits(['exitFocus', 'navigate', 'prevWork', 'nextWork'])
 const showHint = ref(true)
 const showHelp = ref(false)
+const isMobile = navigator.maxTouchPoints > 0
 onMounted(() => setTimeout(() => { showHint.value = false }, 5500))
 </script>
 
@@ -210,7 +211,7 @@ onMounted(() => setTimeout(() => { showHint.value = false }, 5500))
 .minimap-label {
   font-family: 'Space Mono', monospace;
   font-size: 0.52rem;
-  color: rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.48);
   letter-spacing: 0.14em;
   pointer-events: none;
 }
@@ -390,7 +391,7 @@ onMounted(() => setTimeout(() => { showHint.value = false }, 5500))
 .focus-controls {
   font-family: 'Space Mono', monospace;
   font-size: 0.62rem;
-  color: rgba(255, 255, 255, 0.26);
+  color: rgba(255, 255, 255, 0.50);
   letter-spacing: 0.10em;
   white-space: nowrap;
 }
@@ -426,7 +427,7 @@ onMounted(() => setTimeout(() => { showHint.value = false }, 5500))
 .attribution {
   font-family: 'Noto Serif TC', serif;
   font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.44);
+  color: rgba(255, 255, 255, 0.60);
   letter-spacing: 0.08em;
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
 }
@@ -436,7 +437,7 @@ onMounted(() => setTimeout(() => { showHint.value = false }, 5500))
   transform: translateX(-50%);
   font-family: 'Space Mono', monospace;
   font-size: 0.62rem;
-  color: rgba(255, 255, 255, 0.32);
+  color: rgba(255, 255, 255, 0.58);
   letter-spacing: 0.10em;
   white-space: nowrap;
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
@@ -496,7 +497,7 @@ onMounted(() => setTimeout(() => { showHint.value = false }, 5500))
   font-family: 'Space Mono', monospace;
   font-size: 0.58rem;
   letter-spacing: 0.22em;
-  color: rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.42);
   text-transform: uppercase;
   padding-bottom: 0.50rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);

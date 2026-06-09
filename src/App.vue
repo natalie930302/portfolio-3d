@@ -54,6 +54,7 @@ window.addEventListener('drop', e => { e.preventDefault(); dragCount = 0; draggi
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Space+Mono:wght@400;700&display=swap');
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { overscroll-behavior: none; overflow: hidden; height: 100%; }
 body { background: #0d0c0b; color: #fff; font-family: 'Noto Serif TC', serif; }
 
 .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.25rem; padding: 7rem 2rem; text-align: center; min-height: 100vh; }
