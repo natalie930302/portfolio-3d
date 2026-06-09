@@ -1,6 +1,23 @@
 <template>
   <div class="gallery-wrap">
     <canvas ref="canvasEl" class="gallery-canvas" />
+
+    <!-- Gyroscope toggle — only shown on touch devices with DeviceOrientationEvent -->
+    <button
+      v-if="showGyroBtn"
+      class="gyro-btn"
+      :class="{ active: gyroActive, pending: gyroPending }"
+      :title="gyroActive ? '重新校準 / 關閉陀螺儀' : '啟用陀螺儀鏡頭'"
+      @click="toggleGyro"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-30 12 12)" />
+        <ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(30 12 12)" />
+        <circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" />
+      </svg>
+      <span>{{ gyroActive ? '陀螺儀' : '陀螺儀' }}</span>
+    </button>
+
     <GalleryHUD
       :works="works"
       :pedestal-positions="positions"
@@ -52,6 +69,27 @@ const focusMode = ref("free");
 const focusedWork = ref(null);
 const isLoading = ref(true);
 const playerState = ref({ x: 0, z: 0, yaw: 0 });
+
+// Gyroscope UI state
+const gyroActive  = ref(false);
+const gyroPending = ref(false);
+const showGyroBtn = ref(
+  typeof DeviceOrientationEvent !== 'undefined' && navigator.maxTouchPoints > 0
+);
+
+async function toggleGyro() {
+  if (!navigation) return;
+  if (gyroPending.value) return;
+  if (gyroActive.value) {
+    navigation.disableGyro();
+    gyroActive.value = false;
+  } else {
+    gyroPending.value = true;
+    const ok = await navigation.enableGyro();
+    gyroPending.value = false;
+    gyroActive.value = ok;
+  }
+}
 
 // Reused vectors to avoid per-frame allocation
 const _sv = new THREE.Vector3();
@@ -352,5 +390,56 @@ onUnmounted(() => _cleanup?.());
 }
 .loader-fade-leave-to {
   opacity: 0;
+}
+
+/* ── Gyroscope button ──────────────────────────────────── */
+.gyro-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 12px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  background: rgba(14, 12, 10, 0.72);
+  backdrop-filter: blur(8px);
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: color 0.25s, border-color 0.25s, background 0.25s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.gyro-btn svg {
+  width: 22px;
+  height: 22px;
+  transition: transform 0.6s ease;
+}
+.gyro-btn span {
+  font-family: "Space Mono", monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+}
+.gyro-btn:active {
+  transform: scale(0.94);
+}
+.gyro-btn.active {
+  color: rgba(255, 218, 130, 0.9);
+  border-color: rgba(255, 218, 130, 0.4);
+  background: rgba(14, 12, 10, 0.85);
+}
+.gyro-btn.active svg {
+  animation: gyro-spin 3s linear infinite;
+}
+.gyro-btn.pending {
+  opacity: 0.5;
+  pointer-events: none;
+}
+@keyframes gyro-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 </style>

@@ -6,6 +6,7 @@ const MAX_SPEED  = 0.09
 const LOOK_SENS  = 0.003
 const ROOM_LIMIT = 8.5
 const PITCH_LIMIT = 1.2   // ~69° — enough to look at ceiling pendants and floor
+const DEG2RAD    = Math.PI / 180
 
 const FOCUS_ROT_SENS  = 0.005
 const FOCUS_ZOOM_SPEED = 0.45
@@ -36,6 +37,15 @@ export function useGalleryNavigation(camera, canvas) {
   let focusDragging = false, focusLastX = 0, focusLastY = 0
 
   let touchId = -1, touchX = 0, touchY = 0
+
+  // Gyroscope state
+  let gyroEnabled = false
+  let gyroBaseAlpha = null
+  let gyroBaseBeta = null
+  let gyroBaseYaw = 0
+  let gyroBasePitch = 0
+  let gyroRawYaw = 0
+  let gyroRawPitch = 0
 
   const focusState = {
     mode: 'free',
@@ -180,7 +190,23 @@ export function useGalleryNavigation(camera, canvas) {
     }
   }
   function onTouchMove(e) {
+    // Rotate focused model with single-finger drag on mobile
+    if (focusState.mode === 'focused' && focusState.activeModelGroup) {
+      for (const t of e.touches) {
+        if (t.identifier !== touchId) continue
+        const dx = t.clientX - touchX
+        const dy = t.clientY - touchY
+        focusState.activeModelGroup.rotation.y += dx * FOCUS_ROT_SENS
+        focusState.activeModelGroup.rotation.x = THREE.MathUtils.clamp(
+          focusState.activeModelGroup.rotation.x + dy * FOCUS_ROT_SENS,
+          -Math.PI / 2, Math.PI / 2
+        )
+        touchX = t.clientX; touchY = t.clientY
+      }
+      return
+    }
     if (focusState.mode !== 'free') return
+    if (gyroEnabled) return  // gyro handles rotation; touch reserved for future joystick
     for (const t of e.touches) {
       if (t.identifier !== touchId) continue
       yaw -= (t.clientX - touchX) * LOOK_SENS * 1.8
@@ -189,6 +215,72 @@ export function useGalleryNavigation(camera, canvas) {
     }
   }
   function onTouchEnd() { touchId = -1 }
+
+  // Gyroscope handlers
+  function onDeviceOrientation(e) {
+    if (!gyroEnabled || focusState.mode !== 'free') return
+    if (e.alpha === null || e.beta === null) return
+
+    const alpha = e.alpha
+    const beta  = e.beta
+
+    // Capture baseline on first valid reading
+    if (gyroBaseAlpha === null) {
+      gyroBaseAlpha = alpha
+      gyroBaseBeta  = beta
+      gyroBaseYaw   = yaw
+      gyroBasePitch = pitch
+      gyroRawYaw    = yaw
+      gyroRawPitch  = pitch
+      return
+    }
+
+    // alpha: compass heading 0-360, clockwise → yaw (CCW in Three.js)
+    let deltaAlpha = alpha - gyroBaseAlpha
+    if (deltaAlpha >  180) deltaAlpha -= 360
+    if (deltaAlpha < -180) deltaAlpha += 360
+
+    // beta: ~90° when phone upright in portrait; tilting top away = looking up
+    const deltaBeta = beta - gyroBaseBeta
+
+    gyroRawYaw   = gyroBaseYaw - deltaAlpha * DEG2RAD
+    gyroRawPitch = THREE.MathUtils.clamp(
+      gyroBasePitch + deltaBeta * DEG2RAD,
+      -PITCH_LIMIT, PITCH_LIMIT
+    )
+  }
+
+  function onScreenOrientationChange() {
+    // Recalibrate baseline when device rotates (portrait ↔ landscape)
+    if (gyroEnabled) gyroBaseAlpha = null
+  }
+
+  async function enableGyro() {
+    // iOS 13+ requires explicit user permission
+    if (typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function') {
+      try {
+        const result = await DeviceOrientationEvent.requestPermission()
+        if (result !== 'granted') return false
+      } catch {
+        return false
+      }
+    }
+    gyroEnabled   = true
+    gyroBaseAlpha = null  // baseline set on first event
+    gyroRawYaw    = yaw
+    gyroRawPitch  = pitch
+    window.addEventListener('deviceorientation', onDeviceOrientation)
+    window.addEventListener('orientationchange', onScreenOrientationChange)
+    return true
+  }
+
+  function disableGyro() {
+    gyroEnabled = false
+    gyroBaseAlpha = null
+    window.removeEventListener('deviceorientation', onDeviceOrientation)
+    window.removeEventListener('orientationchange', onScreenOrientationChange)
+  }
 
   canvas.addEventListener('mousedown', onMouseDown)
   window.addEventListener('mousemove', onMouseMove)
@@ -238,6 +330,13 @@ export function useGalleryNavigation(camera, canvas) {
       return
     }
 
+    // Apply gyroscope — frame-rate-independent exponential smoothing
+    if (gyroEnabled) {
+      const k = 1 - Math.exp(-delta / 0.04)
+      yaw   = lerp(yaw,   gyroRawYaw,   k)
+      pitch = lerp(pitch, gyroRawPitch, k)
+    }
+
     // Free navigation
     euler.set(pitch, yaw, 0)
     camera.quaternion.setFromEuler(euler)
@@ -280,6 +379,7 @@ export function useGalleryNavigation(camera, canvas) {
     canvas.removeEventListener('touchstart', onTouchStart)
     canvas.removeEventListener('touchmove', onTouchMove)
     canvas.removeEventListener('touchend', onTouchEnd)
+    disableGyro()
   }
 
   function getPos()       { return camera.position }
@@ -287,5 +387,5 @@ export function useGalleryNavigation(camera, canvas) {
   function getFocusMode() { return focusState.mode }
   function getFocusedIdx() { return focusState.focusedPedestalIdx }
 
-  return { update, unbind, getPos, getYaw, enterFocus, exitFocus, getFocusMode, getFocusedIdx }
+  return { update, unbind, getPos, getYaw, enterFocus, exitFocus, getFocusMode, getFocusedIdx, enableGyro, disableGyro }
 }
